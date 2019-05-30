@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bfd.api.manage.mapper.UserAccessStatisticsMapper" >
+  <resultMap id="UserAccessStatisticsMap" type="com.bfd.api.manage.domain.UserAccessStatistics" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="user_logo" property="userLogo" jdbcType="VARCHAR" />
+    <result column="user_project" property="userProject" jdbcType="VARCHAR" />
+    <result column="api_id" property="apiId" jdbcType="BIGINT" />
+    <result column="app_id" property="appId" jdbcType="BIGINT" />
+    <result column="access_count" property="accessCount" jdbcType="BIGINT" />
+    <result column="success_count" property="successCount" jdbcType="BIGINT" />
+    <result column="access_flow" property="accessFlow" jdbcType="BIGINT" />
+    <result column="deal_count" property="dealCount" jdbcType="BIGINT" /> 
+    <result column="access_day" property="accessDay" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, user_id, user_logo, user_project, api_id, app_id, access_count, success_count, 
+    access_flow, deal_count, access_day, update_time
+  </sql>
+  
+   <select id='selectUserAccessCount' resultType='com.bfd.api.manage.vo.UserAccessCount'  parameterType="java.lang.Object" >
+    select aa.user_id as userId,
+           aa.user_logo as userLogo,
+           aa.user_project as userProject,
+           bb.name as proName,
+           aa.api_id as apiId,
+           cc.api_name as apiName,
+           aa.app_id as appId,
+           dd.app_name as appName,
+           aa.access_count as totalTimes,
+           aa.access_flow as totalFlow,
+           aa.deal_count as totalNum,
+           aa.access_day as accessDay
+    from 
+    (select 
+		    user_id, 
+		    user_logo, 
+		    user_project, 
+		    api_id, 
+		    app_id,
+		    sum(access_count) as access_count,
+		    sum(access_flow) as access_flow,
+		    sum(deal_count) as deal_count,
+		    max(access_day) as access_day
+    from user_access_statistics
+    group by user_id, user_logo, user_project, api_id, app_id 
+    ) aa
+    inner join label_category bb
+    on aa.user_project = bb.id
+    inner join api cc
+    on aa.api_id = cc.id 
+    inner join app dd
+    on aa.app_id = dd.id
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+  <select id='selectUserAccessStatisticByIds' resultType='com.bfd.api.manage.vo.UserAccess'  parameterType="java.lang.Object" >
+    select aa.user_id as userId,
+           aa.user_logo as userLogo,
+           aa.user_project as userProject,
+           bb.name as proName,
+           aa.api_id as apiId,
+           cc.api_name as apiName,
+           aa.app_id as appId,
+           dd.app_name as appName,
+           aa.access_count as accessCount,
+           aa.success_count as successCount,
+           aa.access_flow as accessFlow,
+           aa.deal_count as dealCount,
+           aa.access_day as accessDay,
+           aa.update_time as updateTime
+    from 
+    (select 
+	    user_id, user_logo, user_project, api_id, app_id, access_count, success_count, 
+	    access_flow, deal_count, access_day, update_time
+    from user_access_statistics
+    where user_id = #{userId,jdbcType=VARCHAR} and user_logo = #{logo,jdbcType=VARCHAR}
+    and user_project = #{project,jdbcType=VARCHAR} and api_id = #{apiId,jdbcType=BIGINT}
+    and  app_id = #{appId,jdbcType=BIGINT}) aa
+    inner join label_category bb
+    on aa.user_project = bb.id
+    inner join api cc
+    on aa.api_id = cc.id 
+    inner join app dd
+    on aa.app_id = dd.id
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+  
+</mapper>

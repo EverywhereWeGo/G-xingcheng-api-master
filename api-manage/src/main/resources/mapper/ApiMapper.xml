@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bfd.api.manage.mapper.ApiMapper" >
+  <resultMap id="BaseResultMap" type="com.bfd.api.manage.domain.Api" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="api_name" property="apiName" jdbcType="VARCHAR" />
+    <result column="api_type" property="apiType" jdbcType="INTEGER" />
+    <result column="charge_type" property="chargeType" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="descr" property="descr" jdbcType="VARCHAR" />
+    <result column="auth" property="auth" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="add_time" property="addTime" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+  </resultMap>
+  
+  <select id="getApiByUrl" resultMap="BaseResultMap"  parameterType="java.lang.String" >
+    select 
+    <include refid="Api_List" />
+    from api
+    where  url = #{url,jdbcType=VARCHAR} 
+  </select> 
+  
+  
+  
+  <sql id="Api_List" >
+    id, api_name, api_type, charge_type, url, descr, auth, status, add_time, update_time, user_id
+  </sql>
+  
+  <select id="selectApis" resultMap="BaseResultMap"  parameterType="java.lang.Object" >
+    select 
+	     id, api_name, api_type, charge_type, 
+	     url, descr, auth, status, add_time, update_time, 'admin'
+    from api
+    where 1 = 1 
+	    <if test="apiType != -1" >
+	       and  api_type = #{apiType,jdbcType=INTEGER} 
+	    </if>
+	    <if test="apiName != ''" >
+	       and  api_name like '%' #{apiName,jdbcType=VARCHAR} '%' 
+	    </if>
+	    <if test="apiId != -1" >
+	       and  id = #{apiId,jdbcType=BIGINT} 
+	    </if>
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select> 
+ 
+ 
+ <insert id="insert" parameterType="java.lang.Object" >
+    insert into api (   api_name, 
+					    api_type, 
+					    charge_type, 
+					    url, 
+					    descr, 
+					    auth, 
+					    status,
+					    add_time, 
+					    update_time,
+					    user_id
+      )
+    values  (#{apiName,jdbcType=VARCHAR}, 
+            #{apiType,jdbcType=INTEGER}, 
+            #{chargeType,jdbcType=INTEGER}, 
+            #{url,jdbcType=VARCHAR}, 
+            #{descr,jdbcType=VARCHAR}, 
+            0, 
+            #{status,jdbcType=INTEGER},
+            curdate(),
+			now(), 
+            1
+            )
+  </insert>
+ 
+ 
+  <select id="selectAllApi" resultMap="BaseResultMap"  parameterType="java.lang.Object" >
+    select 
+    <include refid="Api_List" />
+    from api
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+  
+  <select id="count" resultType="java.lang.Integer">
+     select count(*)
+     from api
+  </select>
+  
+  
+   <select id="selectApiByType" resultMap="BaseResultMap" parameterType="java.lang.Object" >
+    select 
+    <include refid="Api_List" />
+    from api
+    where api_type = #{apiType,jdbcType=INTEGER}
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+   <select id="selectApiByName" resultMap="BaseResultMap" parameterType="java.lang.Object" >
+    select 
+    <include refid="Api_List" />
+    from api
+    where api_name like '%' #{apiName,jdbcType=VARCHAR} '%'
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+  
+</mapper>

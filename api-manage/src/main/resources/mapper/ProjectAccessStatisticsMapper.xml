@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bfd.api.manage.mapper.ProjectAccessStatisticsMapper" >
+  <resultMap id="ProjectAccessStatisticsMap" type="com.bfd.api.manage.domain.ProjectAccessStatistics" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="logo" property="logo" jdbcType="VARCHAR" />
+    <result column="project" property="project" jdbcType="VARCHAR" />
+    <result column="api_id" property="apiId" jdbcType="BIGINT" />
+    <result column="access_count" property="accessCount" jdbcType="BIGINT" />
+    <result column="success_count" property="successCount" jdbcType="BIGINT" />
+    <result column="access_flow" property="accessFlow" jdbcType="BIGINT" />
+    <result column="deal_count" property="dealCount" jdbcType="BIGINT" />
+    <result column="access_day" property="accessDay" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List" >
+    id, logo, project, api_id, access_count, success_count, access_flow, deal_count,
+    access_day, update_time
+  </sql>
+  
+  <select id='selectAllProjectAccessStatistics' resultType='com.bfd.api.manage.vo.ProjectAccess'  parameterType="java.lang.Object" >
+    
+    select 
+          aa.logo as logo,
+          aa.project as project,
+          bb.name as proName,
+		  aa.api_id as apiId,
+		  cc.api_name as apiName,
+		  aa.access_count as ac`cessCount,
+		  aa.success_count as successCount,
+		  aa.access_flow as accessFlow,
+		  aa.deal_count as dealCount,
+		  aa.access_day as accessDay,
+		  aa.update_time as updateTime
+    from 
+    (select 
+       logo, project, api_id, access_count, success_count, access_flow, deal_count,
+       access_day, update_time
+    from project_access_statistics
+    where logo = #{logo,jdbcType=VARCHAR} and project = #{project,jdbcType=VARCHAR}
+    and  api_id = #{apiId,jdbcType=BIGINT} ) aa
+    inner join label_category bb
+    on aa.project = bb.id
+    inner join api cc
+    on aa.api_id = cc.id 
+    
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+   <select id="count" resultType="java.lang.Integer">
+     select count(*)
+     from project_access_statistics
+  </select>
+
+   <select id='selectProAccessCount' resultType='com.bfd.api.manage.vo.ProAccessCount' parameterType="java.lang.Object">
+    select aa.logo as logo,
+           aa.project as project,
+           bb.name as proName,
+		   aa.api_id as apiId,
+		   cc.api_name as apiName,
+		   aa.access_count as totalTimes,
+		   aa.access_flow as totalFlow,
+		   aa.deal_count as totalNum,
+		   aa.access_day as accessDay
+    from 
+	    (select 
+			    logo,
+			    project,
+			    api_id,
+			    sum(access_count) as access_count,
+			    sum(access_flow) as access_flow,
+			    sum(deal_count) as deal_count,
+			    max(access_day) as access_day
+	    from project_access_statistics
+	    group by logo,project,api_id) aa
+    inner join label_category bb
+    on aa.project = bb.id
+    inner join api cc
+    on aa.api_id = cc.id
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+
+</mapper>

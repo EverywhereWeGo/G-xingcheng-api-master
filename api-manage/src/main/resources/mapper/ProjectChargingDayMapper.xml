@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bfd.api.manage.mapper.ProjectChargingDayMapper" >
+  <resultMap id="ProjectChargingDayMap" type="com.bfd.api.manage.domain.ProjectChargingDay" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="logo" property="logo" jdbcType="VARCHAR" />
+    <result column="project" property="project" jdbcType="VARCHAR" />
+    <result column="api_id" property="apiId" jdbcType="BIGINT" />
+    <result column="charge_type" property="chargeType" jdbcType="INTEGER" />
+    <result column="charge_id" property="chargeId" jdbcType="BIGINT" />
+    <result column="access_count" property="accessCount" jdbcType="BIGINT" />
+    <result column="access_flow" property="accessFlow" jdbcType="BIGINT" />
+    <result column="deal_count" property="dealCount" jdbcType="BIGINT" />
+    <result column="access_money" property="accessMoney" jdbcType="BIGINT" />
+    <result column="access_day" property="accessDay" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, logo, project, api_id, charge_type, charge_id, access_count, access_flow,
+    deal_count, access_money, access_day, update_time
+  </sql>
+  
+  <select id="selectProChargeDay" resultType="com.bfd.api.manage.vo.ProChargeDay" parameterType="java.lang.Object" > 
+    select aa.logo as logo,
+           aa.project as project,
+           bb.name as projName,
+           aa.api_id as apiId,
+           cc.api_name as apiName,
+           aa.charge_type as chargeType,
+           aa.charge_id as chargeId,
+           aa.access_count as accessCount,
+           aa.access_flow as accessFlow,
+           aa.deal_count as dealCount,
+           aa.access_money as accessMoney,
+           aa.access_day as accessDay,
+           aa.update_time as updateTime
+    from 
+    (select 
+	    logo, project, api_id, charge_type, charge_id, access_count, access_flow,
+        deal_count, access_money, access_day, update_time
+    from project_charging_day
+    where logo = #{logo,jdbcType=VARCHAR} and project = #{project,jdbcType=VARCHAR}
+    and api_id = #{apiId,jdbcType=BIGINT} and charge_type = #{chargeType,jdbcType=INTEGER} 
+    and date_format(access_day,'%Y-%m') =  #{accessMonth,jdbcType=VARCHAR} 
+    ) aa
+    inner join label_category bb
+    on aa.project = bb.id
+    inner join api cc
+    on aa.api_id = cc.id 
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+  <select id="count" resultType="java.lang.Integer">
+     select count(*)
+     from project_charging_day
+  </select>
+</mapper>

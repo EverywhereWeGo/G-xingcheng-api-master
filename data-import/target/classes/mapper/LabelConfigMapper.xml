@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bfd.api.mybatis.mapper.LabelConfigMapper" >
+  <resultMap id="BaseResultMap" type="com.bfd.api.domain.LabelConfig" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="lid" property="lid" jdbcType="INTEGER" />
+    <result column="first_level_name" property="firstLevelName" jdbcType="VARCHAR" />
+    <result column="second_level_name" property="secondLevelName" jdbcType="VARCHAR" />
+    <result column="second_level_field" property="secondLevelField" jdbcType="VARCHAR" />
+    <result column="third_level_name" property="thirdLevelName" jdbcType="VARCHAR" />
+    <result column="first_level_id" property="firstLevelId" jdbcType="VARCHAR" />
+    <result column="second_level_id" property="secondLevelId" jdbcType="VARCHAR" />
+    <result column="third_level_id" property="thirdLevelId" jdbcType="VARCHAR" />
+    <result column="hdfs_path" property="hdfsPath" jdbcType="VARCHAR" />
+    <result column="hive_table" property="hiveTable" jdbcType="VARCHAR" />
+    <result column="hbase_table" property="hbaseTable" jdbcType="VARCHAR" />
+    <result column="hbase_column" property="hbaseColumn" jdbcType="VARCHAR" />
+    <result column="merge_hbase_table" property="mergeHbaseTable" jdbcType="VARCHAR" />
+    <result column="merge_hbase_column" property="mergeHbaseColumn" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="DATE" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="availably" property="availably" jdbcType="INTEGER" />
+    <result column="mutex" property="mutex" jdbcType="INTEGER" />
+    <result column="period" property="period" jdbcType="INTEGER" />
+    <result column="alpha" property="alpha" jdbcType="DOUBLE" />
+    <result column="label_num" property="labelNum" jdbcType="BIGINT" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="is_num" property="isNum" jdbcType="INTEGER" />
+    <result column="is_count_label" property="isCountLabel" jdbcType="INTEGER" />
+    <result column="hive_field" property="hiveField" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, lid, first_level_name, second_level_name, second_level_field, third_level_name, 
+    first_level_id, second_level_id, third_level_id, hdfs_path, hive_table, hbase_table, 
+    hbase_column, merge_hbase_table, merge_hbase_column, create_time, type, availably, 
+    mutex, period, alpha, label_num, update_date, is_num, is_count_label, hive_field
+  </sql>
+
+  <select id="selectByLabelId" resultType="com.bfd.api.vo.LabelVo" >
+    SELECT DISTINCT(a.label_id),a.id,a.label_id AS labelId,c.label_name AS labelName,a.parent_id AS parentId,b.hbase_column
+     AS hbaseColumn FROM label_info a
+     inner join label_config b on b.lid = a.label_id
+    inner join (
+	SELECT parent_id,label_name FROM label_info 
+	WHERE label_id IN 
+	<foreach collection="labelId" item="item" index="index" open="(" separator="," close=")">#{item}</foreach> )c 
+	on a.id=c.parent_id;
+  </select>
+  
+ <!-- 旧版 
+  <select id="selectByLabelId" resultType="com.bfd.api.vo.LabelVo" >
+    SELECT DISTINCT(a.label_id),a.id,a.label_id AS labelId,c.label_name AS labelName,a.parent_id AS parentId,b.hbase_column AS hbaseColumn FROM label_info a,label_config b,(
+	SELECT * FROM label_info 
+	WHERE label_id IN 
+	<foreach collection="labelId" item="item" index="index" open="(" separator="," close=")">#{item}</foreach> )c
+	WHERE a.id=c.parent_id
+	AND b.lid = a.label_id;
+  </select> -->
+  
+  
+  
+  
+  <select id="list" resultType="com.bfd.api.domain.LabelConfig" >
+ 	 select hbase_column as hbaseColumn ,third_level_id as thirdLevelId from label_config
+  </select>
+</mapper>

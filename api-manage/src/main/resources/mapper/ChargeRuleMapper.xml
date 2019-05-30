@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bfd.api.manage.mapper.ChargeRuleMapper" >
+  <resultMap id="ChargeRuletMap" type="com.bfd.api.manage.domain.ChargeRule" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="spend_type" property="spendType" jdbcType="INTEGER" />
+    <result column="spend_name" property="spendName" jdbcType="VARCHAR" />
+    <result column="upper_limit" property="upperLimit" jdbcType="BIGINT" />
+    <result column="lower_limit" property="lowerLimit" jdbcType="BIGINT" />
+    <result column="unit_price" property="unitPrice" jdbcType="BIGINT" />
+    <result column="is_discount" property="isDiscount" jdbcType="INTEGER" />
+    <result column="discount" property="discount" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, spend_type, spend_name, upper_limit, lower_limit, unit_price, is_discount, discount, 
+    status, add_time, update_time
+  </sql>
+  
+  <select id="selectAllChargeRules" resultMap="ChargeRuletMap"  parameterType="java.lang.Object">
+    select 
+    <include refid="Base_Column_List" />
+    from charge_rule
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+  <select id="count" resultType="java.lang.Integer">
+     select count(*)
+     from charge_rule
+  </select>
+  
+  <insert id="insert" parameterType="com.bfd.api.manage.domain.ChargeRule" >
+    insert into charge_rule (spend_type, spend_name, 
+      upper_limit, lower_limit, unit_price, 
+      is_discount, discount, status, 
+      add_time, update_time)
+    values (#{spendType,jdbcType=INTEGER}, #{spendName,jdbcType=VARCHAR}, 
+      #{upperLimit,jdbcType=BIGINT}, #{lowerLimit,jdbcType=BIGINT}, #{unitPrice,jdbcType=BIGINT}, 
+      #{isDiscount,jdbcType=INTEGER}, #{discount,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, 
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.bfd.api.manage.domain.ChargeRule" >
+    insert into charge_rule
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="spendType != null" >
+        spend_type,
+      </if>
+      <if test="spendName != null" >
+        spend_name,
+      </if>
+      <if test="upperLimit != null" >
+        upper_limit,
+      </if>
+      <if test="lowerLimit != null" >
+        lower_limit,
+      </if>
+      <if test="unitPrice != null" >
+        unit_price,
+      </if>
+      <if test="isDiscount != null" >
+        is_discount,
+      </if>
+      <if test="discount != null" >
+        discount,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="addTime != null" >
+        add_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="spendType != null" >
+        #{spendType,jdbcType=INTEGER},
+      </if>
+      <if test="spendName != null" >
+        #{spendName,jdbcType=VARCHAR},
+      </if>
+      <if test="upperLimit != null" >
+        #{upperLimit,jdbcType=BIGINT},
+      </if>
+      <if test="lowerLimit != null" >
+        #{lowerLimit,jdbcType=BIGINT},
+      </if>
+      <if test="unitPrice != null" >
+        #{unitPrice,jdbcType=BIGINT},
+      </if>
+      <if test="isDiscount != null" >
+        #{isDiscount,jdbcType=INTEGER},
+      </if>
+      <if test="discount != null" >
+        #{discount,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKey" parameterType="com.bfd.api.manage.domain.ChargeRule" >
+    update charge_rule
+    set spend_type = #{spendType,jdbcType=INTEGER},
+      spend_name = #{spendName,jdbcType=VARCHAR},
+      upper_limit = #{upperLimit,jdbcType=BIGINT},
+      lower_limit = #{lowerLimit,jdbcType=BIGINT},
+      unit_price = #{unitPrice,jdbcType=BIGINT},
+      is_discount = #{isDiscount,jdbcType=INTEGER},
+      discount = #{discount,jdbcType=BIGINT},
+      status = #{status,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

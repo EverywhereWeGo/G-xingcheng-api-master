@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bfd.api.mybatis.mapper.LabelCommonMapper" >
+
+  <select id="selectByLabelId" resultType="com.bfd.api.vo.CommonLabelVo" >
+    SELECT id,name,code,parent_id,label_level,level from label_dx 
+	WHERE id IN 
+	<foreach collection="labelId" item="item" index="index" open="(" separator="," close=")">#{item}</foreach> ;
+  </select>
+  
+</mapper>

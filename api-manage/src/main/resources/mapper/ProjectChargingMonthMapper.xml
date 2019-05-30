@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bfd.api.manage.mapper.ProjectChargingMonthMapper" >
+  <resultMap id="ProjectChargingMonthMap" type="com.bfd.api.manage.domain.ProjectChargingMonth" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="logo" property="logo" jdbcType="VARCHAR" />
+    <result column="project" property="project" jdbcType="VARCHAR" />
+    <result column="api_id" property="apiId" jdbcType="BIGINT" />
+    <result column="charge_type" property="chargeType" jdbcType="INTEGER" />
+    <result column="charge_id" property="chargeId" jdbcType="BIGINT" />
+    <result column="access_count" property="accessCount" jdbcType="BIGINT" />
+    <result column="access_flow" property="accessFlow" jdbcType="BIGINT" />
+    <result column="deal_count" property="dealCount" jdbcType="BIGINT" />
+    <result column="access_money" property="accessMoney" jdbcType="BIGINT" />
+    <result column="access_month" property="accessMonth" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List" >
+    id, logo, project, api_id, charge_type, charge_id, access_count,access_flow, deal_count, 
+     access_money, access_month, update_time
+  </sql>
+  
+   <select id='selectProAccessMonth' resultType='com.bfd.api.manage.vo.ProChargeMonth' parameterType="java.lang.Object">
+    select aa.logo as logo,
+           aa.project as project,
+           bb.name as proName,
+           aa.api_id as apiId,
+           cc.api_name as apiName,
+           aa.charge_type as chargeType,
+           aa.access_money as totalCost,
+           aa.update_time as accessMonth
+    from 
+    (select  
+		    logo,
+		    project,
+		    api_id,
+		    charge_type,
+		    sum(access_money) as access_money,
+		    max(update_time) as update_time
+    from project_charging_month
+    group by logo,project,api_id,charge_type) aa
+    inner join label_category bb
+    on aa.project = bb.id
+    inner join api cc
+    on aa.api_id = cc.id
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+   <select id='selectProAccessMonthByLogo' resultType='com.bfd.api.manage.vo.ProjectChargingMonthVo'  parameterType="java.lang.Object" >
+    select aa.logo as logo,
+           aa.project as project,
+           bb.name as projName,
+           aa.api_id as apiId,
+           cc.api_name as apiName,
+           aa.charge_type as chargeType,
+           aa.charge_id as chargeId,
+           aa.access_count as accessCount,
+           aa.access_flow as accessFlow,
+           aa.deal_count as dealCount,
+           aa.access_money as accessMoney,
+           aa.access_month as accessMonth,
+           aa.update_time as updateTime
+    from 
+    (select 
+    	   logo, project, api_id, charge_type, charge_id, access_count,access_flow, deal_count, 
+           access_money, access_month, update_time
+    from project_charging_month
+    where logo = #{logo,jdbcType=VARCHAR} and project = #{project,jdbcType=VARCHAR}
+    and  api_id = #{apiId,jdbcType=BIGINT} and charge_type = #{chargeType,jdbcType=INTEGER}) aa
+    inner join label_category bb
+    on aa.project = bb.id
+    inner join api cc
+    on aa.api_id = cc.id
+    <if test="pageNo != null and pageSize != null"> 
+	limit #{pageNo,jdbcType=BIGINT},#{pageSize,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+</mapper>
